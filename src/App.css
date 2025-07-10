@@ -1,0 +1,578 @@
+html, body, #root {
+  width: 100vw;
+  height: 100vh;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.app-root-fullpage {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.kanban-board-fullpage {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Ensure Kanban lists do not expand the page width */
+.kanban-list {
+  flex: 0 0 auto;
+  min-width: 320px;
+  max-width: 340px;
+  background: #FFFFFF;
+  color: #333333;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(47,128,237,0.04);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  background: linear-gradient(135deg, #56CCF2 0%, #2F80ED 50%, #42a5f5 100%);
+}
+
+body.light-theme {
+  background: linear-gradient(135deg, #f4f6fa 0%, #56CCF2 50%, #fff 100%);
+}
+
+body.dark-theme {
+  background: linear-gradient(135deg, #232526 0%, #414345 100%);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #56CCF2;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2F80ED;
+}
+
+/* Drag and drop styles */
+.dragging {
+  opacity: 0.5;
+  transform: rotate(5deg);
+}
+
+.drag-over {
+  background-color: rgba(25, 118, 210, 0.1);
+  border: 2px dashed #1976d2;
+}
+
+/* Card hover effects */
+.card-hover {
+  transition: all 0.2s ease-in-out;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .kanban-board {
+    padding: 8px;
+  }
+  
+  .kanban-list {
+    width: 280px;
+    min-width: 280px;
+  }
+}
+
+@media (max-width: 480px) {
+  .kanban-list {
+    width: 260px;
+    min-width: 260px;
+  }
+}
+
+/* Animation for new cards */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.new-card {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Loading states */
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Focus styles for accessibility */
+button:focus,
+input:focus,
+textarea:focus {
+  outline: 2px solid #1976d2;
+  outline-offset: 2px;
+}
+
+/* Custom button styles */
+.custom-button {
+  text-transform: none;
+  font-weight: 500;
+  border-radius: 8px;
+}
+
+/* Status indicators */
+.status-overdue {
+  color: #2F80ED;
+}
+
+.status-upcoming {
+  color: #56CCF2;
+}
+
+.status-due-today {
+  color: #2F80ED;
+}
+
+/* Attachment styles */
+.attachment-item {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  border-radius: 4px;
+  background-color: #F4F6F8;
+  color: #333333;
+  margin-bottom: 4px;
+}
+
+.attachment-item:hover {
+  background: #56CCF2;
+  color: #fff;
+}
+
+/* Board header styles */
+.board-header {
+  background: #FFFFFF;
+  color: #2F80ED;
+  padding: 20px 32px 16px 32px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(47,128,237,0.04);
+}
+
+/* List styles */
+.list-container {
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(47,128,237,0.04);
+  padding: 16px 12px 24px 12px;
+  min-width: 320px;
+  max-width: 340px;
+  margin-right: 24px;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.2s;
+}
+
+.list-container:hover {
+  box-shadow: 0 6px 24px rgba(25, 118, 210, 0.12);
+}
+
+body.light-theme .list-container {
+  background: #e3f2fd;
+  color: #222;
+  box-shadow: 0 4px 16px rgba(86,204,242,0.18);
+}
+
+body.dark-theme .list-container {
+  background: #23272A;
+  color: #f4f6fa;
+}
+
+/* Add a subtle border to cards for contrast */
+.MuiPaper-root {
+  border: 1px solid rgba(86,204,242,0.10);
+}
+
+/* Card styles */
+.card-container {
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(47,128,237,0.06);
+  margin-bottom: 12px;
+  padding: 14px 16px;
+  transition: box-shadow 0.2s, transform 0.2s;
+  cursor: grab;
+  border-left: 4px solid #2F80ED;
+  position: relative;
+  animation: fadeIn 0.3s;
+  background: #fff;
+}
+
+body.light-theme .card-container {
+  background: #e3e8ee;
+  color: #222;
+}
+
+body.dark-theme .card-container {
+  background: #23272A;
+  color: #f4f6fa;
+}
+
+.card-container:hover {
+  box-shadow: 0 4px 16px rgba(86,204,242,0.10);
+}
+
+/* Priority indicators */
+.priority-high {
+  border-left-color: #2F80ED;
+}
+
+.priority-medium {
+  border-left-color: #56CCF2;
+}
+
+.priority-low {
+  border-left-color: #BDBDBD;
+}
+
+.kanban-board-header {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(47,128,237,0.04);
+  padding: 20px 32px 16px 32px;
+  margin-bottom: 24px;
+}
+
+.board-list-scroll {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 8px;
+  margin-bottom: 24px;
+  width: 100%;
+  min-width: 0;
+}
+
+.board-card {
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(47,128,237,0.06);
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: box-shadow 0.2s, transform 0.2s;
+  border: 2px solid transparent;
+  overflow: hidden;
+  display: inline-flex;
+  vertical-align: middle;
+}
+.board-card.selected {
+  border: 2px solid #2F80ED;
+  box-shadow: 0 4px 16px rgba(47,128,237,0.10);
+  transform: scale(1.04);
+}
+.board-card:hover {
+  box-shadow: 0 6px 24px rgba(86,204,242,0.12);
+}
+
+.list-header {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2F80ED;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fab-add-card {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  background: linear-gradient(90deg, #1976d2 0%, #42a5f5 100%);
+  color: white;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(25, 118, 210, 0.16);
+  cursor: pointer;
+  font-size: 2rem;
+  z-index: 10;
+  transition: box-shadow 0.2s, background 0.2s;
+}
+.fab-add-card:hover {
+  background: linear-gradient(90deg, #1565c0 0%, #1976d2 100%);
+  box-shadow: 0 8px 32px rgba(25, 118, 210, 0.24);
+}
+
+.board-card button {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .kanban-list {
+    min-width: 260px;
+    max-width: 280px;
+  }
+}
+@media (max-width: 600px) {
+  .kanban-board-header {
+    padding: 16px 8px 8px 8px;
+    border-radius: 0 0 12px 12px;
+    margin-bottom: 16px;
+  }
+  .list-container {
+    min-width: 180px;
+    max-width: 220px;
+    padding: 8px 4px 16px 4px;
+  }
+  .card-container {
+    padding: 8px 8px;
+  }
+}
+
+/* Desktop: >1200px */
+@media (min-width: 1201px) {
+  .kanban-list, .list-container {
+    min-width: 320px;
+    max-width: 340px;
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+  .card-container {
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+  .kanban-board-fullpage {
+    max-height: 90vh;
+    padding: 24px;
+  }
+}
+
+/* Laptop: 900-1200px */
+@media (max-width: 1200px) and (min-width: 901px) {
+  .kanban-list, .list-container {
+    min-width: 260px;
+    max-width: 280px;
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  .card-container {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  .kanban-board-fullpage {
+    max-height: 80vh;
+    padding: 16px;
+  }
+}
+
+/* Tablet: 600-900px */
+@media (max-width: 900px) and (min-width: 601px) {
+  .kanban-list, .list-container {
+    min-width: 200px;
+    max-width: 220px;
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+  .card-container {
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+  .kanban-board-fullpage {
+    max-height: 70vh;
+    padding: 8px;
+  }
+}
+
+/* Mobile: 480-600px */
+@media (max-width: 600px) and (min-width: 481px) {
+  .kanban-list, .list-container {
+    min-width: 150px;
+    max-width: 170px;
+    max-height: 40vh;
+    overflow-y: auto;
+  }
+  .card-container {
+    max-height: 40vh;
+    overflow-y: auto;
+  }
+  .kanban-board-fullpage {
+    max-height: 60vh;
+    padding: 4px;
+  }
+}
+
+/* Small Mobile: <480px */
+@media (max-width: 480px) {
+  .kanban-list, .list-container {
+    min-width: 120px;
+    max-width: 140px;
+    max-height: 32vh;
+    overflow-y: auto;
+  }
+  .card-container {
+    max-height: 32vh;
+    overflow-y: auto;
+  }
+  .kanban-board-fullpage {
+    max-height: 50vh;
+    padding: 2px;
+  }
+}
+
+/* Make board and lists always horizontally scrollable on small screens */
+@media (max-width: 900px) {
+  .board-list-scroll, .kanban-board-fullpage {
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+    min-width: 0 !important;
+  }
+}
+
+/* Stack toolbar buttons and profile on mobile */
+@media (max-width: 600px) {
+  .MuiToolbar-root {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 4px;
+  }
+  .MuiToolbar-root > * {
+    margin-right: 0 !important;
+    margin-bottom: 4px !important;
+  }
+}
+
+/* Responsive board card sizing and gap */
+@media (max-width: 1200px) {
+  .board-card {
+    padding: 8px 16px;
+    font-size: 1rem;
+    min-width: 120px;
+    max-width: 180px;
+    overflow: hidden;
+  }
+  .board-card button, .board-card * {
+    font-size: 0.98rem !important;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .board-card + .board-card {
+    margin-left: 8px;
+  }
+  .board-list-scroll, .board-card-container {
+    gap: 8px !important;
+  }
+}
+@media (max-width: 900px) {
+  .board-card {
+    padding: 6px 12px;
+    font-size: 0.95rem;
+    min-width: 100px;
+    max-width: 150px;
+    overflow: hidden;
+  }
+  .board-card button, .board-card * {
+    font-size: 0.92rem !important;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .board-card + .board-card {
+    margin-left: 6px;
+  }
+  .board-list-scroll, .board-card-container {
+    gap: 6px !important;
+  }
+}
+@media (max-width: 600px) {
+  .board-card {
+    padding: 4px 8px;
+    font-size: 0.9rem;
+    min-width: 80px;
+    max-width: 120px;
+    overflow: hidden;
+  }
+  .board-card button, .board-card * {
+    font-size: 0.85rem !important;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .board-card + .board-card {
+    margin-left: 4px;
+  }
+  .board-list-scroll, .board-card-container {
+    gap: 4px !important;
+  }
+}
+@media (max-width: 480px) {
+  .board-card {
+    padding: 2px 4px;
+    font-size: 0.85rem;
+    min-width: 60px;
+    max-width: 90px;
+    overflow: hidden;
+  }
+  .board-card button, .board-card * {
+    font-size: 0.78rem !important;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .board-card + .board-card {
+    margin-left: 2px;
+  }
+  .board-list-scroll, .board-card-container {
+    gap: 2px !important;
+  }
+}
